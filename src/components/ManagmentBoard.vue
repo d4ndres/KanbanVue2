@@ -30,6 +30,11 @@ export default {
               title: "Add SEO keywords",
               createdAt: new Date(),
             },
+            {
+              id: nanoid(),
+              title: "Add Google Analytics",
+              createdAt: new Date(),
+            }
           ],
         },
         {
