@@ -1,28 +1,19 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="p-10 h-[100vh] bg-gradient-to-r from-sky-500 to-indigo-500 overflow-auto">
+    <h1 class="text-4xl text-white flex items-center mb-10">
+      Management Board
+    </h1>
+    <ManagmentBoard />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import ManagmentBoard from './components/ManagmentBoard.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    ManagmentBoard
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
