@@ -37,10 +37,10 @@ export default {
       v-model="title"
       @keydown.tab="createTask"
       @keydown.enter="createTask"
-      class="w-full p-2 rounded resize-none border-none focus:outline-none focus:border-blue-300 focus:bg-white bg-transparent"
+      class="duration-300 w-full p-2 mt-2 rounded resize-none border-none focus:outline-none focus:border-blue-300 focus:bg-white bg-transparent"
       :class="{
-        'h-11': !focused,
-        'h-24': focused,
+        'h-11 bg-bg': !focused,
+        'h-24 bg-oscuro': focused,
       }"
       @focus="focused = true"
       @blur="focused = false"
