@@ -4,7 +4,7 @@ import draggable from 'vuedraggable'
 import BoardTask from '@/components/BoardTask.vue'
 import NewTask from '@/components/NewTask.vue'
 import { ref } from '@vue/composition-api'
-
+import { useMagicKeys } from '@vueuse/core';
 
 
 export default {
@@ -146,6 +146,8 @@ export default {
         ],
       },
     ],)
+    
+    const { ctrl } = useMagicKeys()
 
     function createColumn() {
       const column = {
@@ -162,6 +164,7 @@ export default {
     return {
       columns,
       createColumn,
+      ctrl
     }
   }
 
@@ -170,13 +173,9 @@ export default {
 
 <template>
   <div class="board flex gap-4 overflow-auto">
-    <draggable :group="{ name: 'columns' }" handle=".drag-handle" animation="300" v-model="columns">
+    <draggable :group="{ name: 'columns',  }" handle=".drag-handle" animation="300" v-model="columns">
       <transition-group class="flex gap-4  items-start">
         <div v-for="column in columns" :key="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
-
-          <!-- <div @click="columns = columns.filter(item => item.id != column.id)"
-            class="bg-rojo hover:bg-hrojo absolute left-1 top-1 w-[15px] h-[15px] rounded-[50%] cursor-pointer">
-          </div> -->
 
           <header class="flex font-bold mb-4">
             <div class="cursor-pointer">
@@ -189,10 +188,11 @@ export default {
 
           <div class="">
             <draggable :style="`border-color: ${column.color}`" class="container-tasks border-t-2"
-              ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks' }" handle=".drag-handle"
+              ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks', pull: ctrl ? 'clone' : true, }" handle=".drag-handle"
               animation="300">
               <transition-group class="" :class="{ 'block min-h-[1px] duration-500': column.tasks.length == 0 }">
-                <BoardTask :task="task" v-for="task in column.tasks" :key="task.id" />
+                <BoardTask
+                :task="task" v-for="task in column.tasks" :key="task.id" />
               </transition-group>
             </draggable>
           </div>
