@@ -1,13 +1,10 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
-import store from '@/store/index'
+import store from './store'
 import VueCompositionAPI from '@vue/composition-api'
 import App from './App.vue'
 import './style.css'
 
-Vue.use(Vuex)
 Vue.use(VueCompositionAPI)
-
 
 Vue.config.productionTip = false
 
