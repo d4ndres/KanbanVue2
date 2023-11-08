@@ -1,19 +1,24 @@
 <script>
 import draggable from 'vuedraggable'
 import BoardTask from '@/components/BoardTask.vue'
-import ModalAdminTask from '@/components/ModalAdminTask.vue';
-import { useMagicKeys } from '@vueuse/core';
+import ModalNewCard from '@/components/ModalNewCard.vue';
+import ModalShowCard from '@/components/ModalShowCard.vue';
+
 export default {
   name: 'ManagmentBoard',
   components: {
     BoardTask,
     draggable,
-    ModalAdminTask,
+    ModalNewCard,
+    ModalShowCard,
 },
   data() {
     return {
-      ModalAdminTask: false,
       ctrl: false,
+      
+      selectedCard: null,
+      isModalNewCard: false,
+      isModalShowCard: false,
     }
   },
   mounted() {
@@ -35,8 +40,13 @@ export default {
       this.$store.dispatch('addColumn')
       this.$nextTick(() => document.querySelector('.column:last-of-type .title-column').focus())
     },
-    newCard() {
-      this.ModalAdminTask = true
+    newCard( selectedCard ) {
+      this.selectedCard = selectedCard
+      this.isModalNewCard = true
+    },
+    showCard( selectedCard ) {
+      this.selectedCard = selectedCard
+      this.isModalShowCard = true
     }
   },
 }
@@ -44,9 +54,14 @@ export default {
 
 <template>
   <div class="flex gap-4">
-    <ModalAdminTask 
-    @close="ModalAdminTask = false"
-    v-if="ModalAdminTask"/>
+    <ModalNewCard 
+    :selectedDefault="selectedCard"
+    @close="isModalNewCard = false"
+    v-if="isModalNewCard"/>
+    <ModalShowCard
+    :selectedDefault="selectedCard"
+    @close="isModalShowCard = false"
+    v-if="isModalShowCard"/>
     <draggable :group="{ name: 'columns', }" handle=".drag-handle" animation="300" v-model="columns">
       <transition-group class="flex gap-4  items-start">
         <div v-for="column in columns" :key="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
@@ -65,14 +80,14 @@ export default {
               ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks' }" handle=".drag-handle"
               animation="300">
               <transition-group class="" :class="{ 'block min-h-[1px] duration-500': column.tasks.length == 0 }">
-                <BoardTask :task="task" v-for="task in column.tasks" :key="task.id" />
+                <BoardTask v-for="task in column.tasks" :key="task.id" :task="task" @showCard="showCard"/>
               </transition-group>
             </draggable>
           </div>
 
 
           <footer class="text-gray-500">
-            <div class="w-full p-2 mt-2 rounded hover:text-hgris cursor-pointer" @click="newCard">
+            <div class="w-full p-2 mt-2 rounded hover:text-hgris cursor-pointer" @click="newCard(column)">
               <span>+ Add a card</span>
             </div>
           </footer>

@@ -91,6 +91,9 @@ export default new Vuex.Store({
     },
     addColumn(state, column) {
       state.columns.push(column);
+    },
+    addCard(state, { index, column }) {
+      state.columns[index].tasks.push(column);
     }
   },
   actions: {
@@ -104,6 +107,15 @@ export default new Vuex.Store({
         tasks: [],
       }
       commit('addColumn', column);
+    },
+    addCard({ commit, state }, payload ) {
+      const index = state.columns.findIndex(column => column.id === payload.columnId);
+      const column = {
+        id: nanoid(),
+        title: payload.title,
+        createdAt: new Date(),
+      }
+      commit('addCard', { index, column });
     }
   },
   getters: {
