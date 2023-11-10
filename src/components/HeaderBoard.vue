@@ -2,12 +2,14 @@
   <div>
     <!-- <div class="space-y-5"></div> -->
     <!-- <div class="p-4 bg-blanco shadow rounded-lg"> -->
-    <div class="dev | container | p-1 my-3 mx-auto | flex">
-      <section class="dev | p-11 mr-1">
+    <div class="container | p-3 my-1 mx-auto | flex">
+      <section class="w-3/16 p-12 mr-3 | bg-oscuro | text-morado | font-bold">
         <p>titulo</p>
       </section>
 
-      <section class="dev | container | p-2 mr-2 my-30 | flex">
+      <section
+        class="container | p-2 mr-2 my-30 | bg-oscuro | flex | text-morado | font-bold"
+      >
         <p>kanba final</p>
       </section>
     </div>

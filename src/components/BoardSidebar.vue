@@ -10,11 +10,12 @@ export default {
 </script>
 
 <template>
-  <div class="dev | container | p-1 my-3 mx-auto | flex">
+  <div
+    class="container | min-h-3/4 p-3 my-2 mx-auto | bg-bg rounded-x1 shadow-2xl | flex"
+  >
     <!-- Left side -->
-    <section class="dev | p-9 mr-1">
+    <section class="w-1/2 p-3 mr-2 | bg-oscuro | text-morado | font-bold">
       <!-- Search notes -->
-      <p>titulo</p>
 
       <!-- Note list -->
       <p>Note list</p>
