@@ -1,185 +1,86 @@
 <script>
-import { nanoid } from 'nanoid'
 import draggable from 'vuedraggable'
 import BoardTask from '@/components/BoardTask.vue'
-import NewTask from '@/components/NewTask.vue'
-import { ref } from '@vue/composition-api'
-
-
-
+import ModalNewCard from '@/components/ModalNewCard.vue';
+import ModalShowCard from '@/components/ModalShowCard.vue';
 export default {
   name: 'ManagmentBoard',
   components: {
     BoardTask,
     draggable,
-    NewTask,
-  },
-  setup() {
-    const columns = ref([
-      {
-        id: nanoid(),
-        title: "Backlog",
-        color: '#49C4E5',
-        tasks: [
-          {
-            id: nanoid(),
-            title: "Create marketing landing page",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Install SSL certificate",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Create marketing landing page",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Add Firebase Analytics",
-            createdAt: new Date(),
-          },
-
-          {
-            id: nanoid(),
-            title: "Add SEO keywords",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Add Google Analytics",
-            createdAt: new Date(),
-          }
-        ],
-      },
-      {
-        id: nanoid(),
-        title: "In Progress",
-        color: '#8471F2',
-        tasks: [
-
-          {
-            id: nanoid(),
-            title: "Install SSL certificate",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Implement user authentication",
-            createdAt: new Date(),
-          },
-
-          {
-            id: nanoid(),
-            title: "Optimize page load speed",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Refactor codebase",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Improve UI/UX",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Fix reported bugs",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Document the API",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Conduct user testing",
-            createdAt: new Date(),
-          },
-        ],
-      },
-      {
-        id: nanoid(),
-        title: "Done",
-        color: '#67E2AE',
-        tasks: [
-          {
-            id: nanoid(),
-            title: "Finalize marketing landing page",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Prepare weekly newsletter",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Design database schema",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Write unit tests",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Setup continuous integration",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Deploy to production",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Monitor system performance",
-            createdAt: new Date(),
-          },
-        ],
-      },
-    ],)
-
-    function createColumn() {
-      const column = {
-        id: nanoid(),
-        title: "",
-        tasks: [],
-      }
-      columns.value.push(column)
-      this.$nextTick(() => document.querySelector('.column:last-of-type .title-column').focus())
-
-
-    }
-
+    ModalNewCard,
+    ModalShowCard,
+},
+  data() {
     return {
-      columns,
-      createColumn,
+      ctrl: false,
+      
+      selectedCard: null,
+      isModalNewCard: false,
+      isModalShowCard: false,
     }
-  }
-
+  },
+  computed: {
+    columns: {
+      get() {
+        return this.$store.state.columns
+      },
+      set(value) {
+        this.$store.dispatch('updateColumns', value)
+      }
+    }
+  },
+  methods: {
+    createColumn() {
+      this.$store.dispatch('addColumn')
+      this.$nextTick(() => document.querySelector('.column:last-of-type .title-column').focus())
+    },
+    newCard( columnId ) {
+      this.selectedCard = { columnId }
+      this.isModalNewCard = true
+    },
+    showCard( task, columnId ) {
+      this.selectedCard = { ...task, columnId }
+      this.isModalShowCard = true
+    },
+    openEditTask( task ) {
+      this.selectedCard = task
+      this.isModalShowCard = false
+      this.isModalNewCard = true
+    },
+    onEnd(){
+      // const moved = {
+      //   fromId: ev.from.parentNode.parentNode.parentNode.id,
+      //   toId: ev.to.parentNode.parentNode.parentNode.id,
+      //   oldIndex: ev.oldIndex,
+      //   newIndex: ev.newIndex,
+      // }
+      this.$store.commit('moveTask')
+    }
+  },
 }
 </script>
 
 <template>
-  <div class="board flex gap-4 overflow-auto">
-    <draggable :group="{ name: 'columns' }" handle=".drag-handle" animation="300" v-model="columns">
-      <transition-group class="flex gap-4  items-start">
-        <div v-for="column in columns" :key="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
+  <div class="flex gap-4">
+    <Transition name="fade">
+      <ModalNewCard 
+      :selectedDefault="selectedCard"
+      @close="isModalNewCard = false"
+      v-if="isModalNewCard"/>
+      <ModalShowCard
+      :selectedDefault="selectedCard"
+      @openEditTask="openEditTask"
+      @close="isModalShowCard = false"
+      v-if="isModalShowCard"/>
+    </Transition>
 
-          <!-- <div @click="columns = columns.filter(item => item.id != column.id)"
-            class="bg-rojo hover:bg-hrojo absolute left-1 top-1 w-[15px] h-[15px] rounded-[50%] cursor-pointer">
-          </div> -->
+    <draggable :group="{ name: 'columns', }" handle=".drag-handle" animation="300" v-model="columns">
+      <transition-group class="flex gap-4  items-start">
+        <div v-for="column in columns" :key="column.id" :id="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
 
           <header class="flex font-bold mb-4">
-            <div class="cursor-pointer">
+            <div class="cursor-pointer drag-handle">
               <span>∷</span>
             </div>
 
@@ -190,16 +91,21 @@ export default {
           <div class="">
             <draggable :style="`border-color: ${column.color}`" class="container-tasks border-t-2"
               ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks' }" handle=".drag-handle"
-              animation="300">
+              animation="300" @end="onEnd">
               <transition-group class="" :class="{ 'block min-h-[1px] duration-500': column.tasks.length == 0 }">
-                <BoardTask :task="task" v-for="task in column.tasks" :key="task.id" />
+                <BoardTask
+                v-for="task in column.tasks" :key="task.id" :task="task" 
+                @click="showCard(task, column.id)"
+                />
               </transition-group>
             </draggable>
           </div>
 
 
           <footer class="text-gray-500">
-            <NewTask @add-task="column.tasks.push($event)" />
+            <div class="w-full p-2 mt-2 rounded hover:text-hgris cursor-pointer" @click="newCard(column.id)">
+              <span>+ Add a card</span>
+            </div>
           </footer>
         </div>
       </transition-group>
@@ -213,8 +119,10 @@ export default {
 </template>
 
 <style scoped>
-.board::-webkit-scrollbar {
-  display: none;
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .4s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>
-
