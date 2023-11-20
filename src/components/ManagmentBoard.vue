@@ -75,6 +75,7 @@ export default {
       v-if="isModalShowCard"/>
     </Transition>
 
+    
     <draggable :group="{ name: 'columns', }" handle=".drag-handle" animation="300" v-model="columns">
       <transition-group class="flex gap-4  items-start">
         <div v-for="column in columns" :key="column.id" :id="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
