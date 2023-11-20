@@ -4,7 +4,19 @@ import { nanoid } from 'nanoid'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+
+const saveAndGetColumns = store => {
+  const columns = localStorage.getItem('columns');
+  if (columns) {
+    store.commit('setColumns', JSON.parse(columns));
+  }
+  store.subscribe((mutation, state) => {
+    localStorage.setItem('columns', JSON.stringify(state.columns));
+  })
+}
+
+const store = new Vuex.Store({
+  plugins: [saveAndGetColumns],
   state: {
     columns: [
       {
@@ -84,16 +96,43 @@ export default new Vuex.Store({
         ],
       },
     ],
+    board: 0
   },
   mutations: {
+    setColumns(state, columns) {
+      state.columns = columns;
+    },
     updateColumns(state, payload) {
       state.columns = payload;
     },
     addColumn(state, column) {
       state.columns.push(column);
     },
-    addCard(state, { index, column }) {
-      state.columns[index].tasks.push(column);
+    addTask(state, {task, columnId}) {
+      const index = state.columns.findIndex(column => column.id === columnId);
+      const newTask = {
+        id: nanoid(),
+        createdAt: new Date(),
+        ...task
+      }
+      state.columns[index].tasks.push(newTask);
+    },
+    deleteTask(state, { task, columnId }) {
+      const indexColumn = state.columns.findIndex(column => column.id === columnId);
+      state.columns[indexColumn].tasks = state.columns[indexColumn].tasks.filter(item => item.id !== task.id);
+    },
+    updateTask(state, { task, columnId}) {
+      const indexColumn = state.columns.findIndex(column => column.id === columnId);
+      const indexTask = state.columns[indexColumn].tasks.findIndex(item => item.id === task.id);
+      const updateTask = {
+        ...task,
+        lastModified: new Date(),
+      }
+      state.columns[indexColumn].tasks[indexTask] = updateTask;
+      state.columns = [...state.columns];
+    },
+    moveTask(state) {
+      state.columns = [...state.columns];
     }
   },
   actions: {
@@ -101,6 +140,7 @@ export default new Vuex.Store({
       commit('updateColumns', payload);
     },
     addColumn({ commit }) {
+      // Deberia existir algo para recibir los datos y despues actualizarlo 
       const column = {
         id: nanoid(),
         title: "",
@@ -108,17 +148,19 @@ export default new Vuex.Store({
       }
       commit('addColumn', column);
     },
-    addCard({ commit, state }, payload ) {
-      const index = state.columns.findIndex(column => column.id === payload.columnId);
-      const column = {
-        id: nanoid(),
-        title: payload.title,
-        createdAt: new Date(),
-      }
-      commit('addCard', { index, column });
-    }
+    addTask({ commit }, {task, columnId} ) {
+      commit('addTask', { task, columnId });
+    },
+    deleteTask({ commit }, {task, columnId}) {
+      commit('deleteTask', { task, columnId });
+    },
+    updateTask( { commit }, {task, columnId} ) {
+      commit('updateTask', { task, columnId });
+    },
   },
   getters: {
 
   }
 })
+
+export default store;

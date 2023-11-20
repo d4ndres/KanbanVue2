@@ -16,8 +16,8 @@ export default {
 </script>
 <template>
   <div
+    v-on="$listeners"
     :title="task.createdAt.toLocaleString()"
-    @click="showCard"
     class="task drag-handle cursor-move bg-oscuro text-blanco px-4 py-2 mb-2 rounded shadow-sm max-w-[250px]">
     <div class="flex">
       <span>
