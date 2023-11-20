@@ -5,19 +5,42 @@ import { nanoid } from 'nanoid'
 Vue.use(Vuex)
 
 
-const saveAndGetColumns = store => {
-  const columns = localStorage.getItem('columns');
+const saveAndGetBoard = store => {
+
+  // Obtiene los datos del localStorage y los guarda en el store
+  const columns = localStorage.getItem( store.state.nameBoard);
   if (columns) {
     store.commit('setColumns', JSON.parse(columns));
   }
+
+  // Consulta si existe una boards que es una lista de strings si no la crea con el primer elemento con state.nameBoard
+  const boards = localStorage.getItem('boards');
+  if (!boards) {
+    localStorage.setItem('boards', JSON.stringify([store.state.nameBoard]));
+  } else {
+    store.commit('setBoards', JSON.parse(boards))
+  }
+
   store.subscribe((mutation, state) => {
-    localStorage.setItem('columns', JSON.stringify(state.columns));
+    if( mutation.type == 'updateNameBoard' ) return;
+
+    localStorage.setItem( state.nameBoard, JSON.stringify(state.columns));
+  
+    const listOfBoards = JSON.parse(localStorage.getItem('boards')) 
+    if( !listOfBoards.includes(state.nameBoard) ) {
+      listOfBoards.push(state.nameBoard);
+      localStorage.setItem('boards', JSON.stringify(listOfBoards));
+    }
+
   })
 }
 
 const store = new Vuex.Store({
-  plugins: [saveAndGetColumns],
+  plugins: [saveAndGetBoard],
   state: {
+    isChanged: false,
+    boards: ['Main board'],
+    nameBoard: 'Main board',
     columns: [
       {
         id: nanoid(),
@@ -26,16 +49,9 @@ const store = new Vuex.Store({
         tasks: [
           {
             id: nanoid(),
-            title: "Create marketing landing page",
+            title: "Task 1 Backlog",
             createdAt: new Date(),
           },
-
-          {
-            id: nanoid(),
-            title: "Add Firebase Analytics",
-            createdAt: new Date(),
-          },
-
 
         ],
       },
@@ -44,26 +60,9 @@ const store = new Vuex.Store({
         title: "In Progress",
         color: '#8471F2',
         tasks: [
-
           {
             id: nanoid(),
-            title: "Install SSL certificate",
-            createdAt: new Date(),
-          },
-
-          {
-            id: nanoid(),
-            title: "Refactor codebase",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Document the API",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Conduct user testing",
+            title: "Task 2 in progress",
             createdAt: new Date(),
           },
         ],
@@ -75,32 +74,20 @@ const store = new Vuex.Store({
         tasks: [
           {
             id: nanoid(),
-            title: "Finalize marketing landing page",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Prepare weekly newsletter",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Design database schema",
-            createdAt: new Date(),
-          },
-          {
-            id: nanoid(),
-            title: "Monitor system performance",
+            title: "Task 3 Done",
             createdAt: new Date(),
           },
         ],
       },
     ],
-    board: 0
+    
   },
   mutations: {
     setColumns(state, columns) {
       state.columns = columns;
+    },
+    setBoards(state, boards) {
+      state.boards = boards;
     },
     updateColumns(state, payload) {
       state.columns = payload;
@@ -133,6 +120,55 @@ const store = new Vuex.Store({
     },
     moveTask(state) {
       state.columns = [...state.columns];
+    },
+    updateNameBoard(state, name) {
+      state.nameBoard = name;
+    },
+    createBoard(state, name) {
+      state.nameBoard = name;
+      state.boards.push(name);
+      state.columns = [
+        {
+          id: nanoid(),
+          title: "Backlog",
+          color: '#49C4E5',
+          tasks: [
+            {
+              id: nanoid(),
+              title: "Task 1 Backlog",
+              createdAt: new Date(),
+            },
+  
+          ],
+        },
+        {
+          id: nanoid(),
+          title: "In Progress",
+          color: '#8471F2',
+          tasks: [
+            {
+              id: nanoid(),
+              title: "Task 2 in progress",
+              createdAt: new Date(),
+            },
+          ],
+        },
+        {
+          id: nanoid(),
+          title: "Done",
+          color: '#67E2AE',
+          tasks: [
+            {
+              id: nanoid(),
+              title: "Task 3 Done",
+              createdAt: new Date(),
+            },
+          ],
+        },
+      ]
+    },
+    toggleIsChanged(state) {
+      state.isChanged = !state.isChanged;
     }
   },
   actions: {
@@ -157,6 +193,25 @@ const store = new Vuex.Store({
     updateTask( { commit }, {task, columnId} ) {
       commit('updateTask', { task, columnId });
     },
+    updateNameBoard({ commit }, name) {
+      // Elimina espacios en blanco al final o inicio
+      const newName = name.trim();
+      commit('updateNameBoard', newName);
+    },
+    createBoard({ commit }, name) {
+      const newName = name.trim();
+      commit('createBoard', newName);
+    },
+    toggleIsChanged({ commit }) {
+      commit('toggleIsChanged');
+    },
+    async changeBoard({ commit, dispatch}, nameBoard ){
+      await dispatch('toggleIsChanged');
+      const board = JSON.parse(localStorage.getItem( nameBoard));
+      await dispatch('updateNameBoard', nameBoard);
+      commit('setColumns', board);
+      dispatch('toggleIsChanged');
+    }
   },
   getters: {
 

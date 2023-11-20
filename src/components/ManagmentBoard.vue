@@ -28,7 +28,15 @@ export default {
       set(value) {
         this.$store.dispatch('updateColumns', value)
       }
-    }
+    },
+    nameBoard: {
+      get() {
+        return this.$store.state.nameBoard
+      },
+      set(value) {
+        this.$store.dispatch('updateNameBoard', value)
+      }
+    },
   },
   methods: {
     createColumn() {
@@ -49,12 +57,6 @@ export default {
       this.isModalNewCard = true
     },
     onEnd(){
-      // const moved = {
-      //   fromId: ev.from.parentNode.parentNode.parentNode.id,
-      //   toId: ev.to.parentNode.parentNode.parentNode.id,
-      //   oldIndex: ev.oldIndex,
-      //   newIndex: ev.newIndex,
-      // }
       this.$store.commit('moveTask')
     }
   },
@@ -62,7 +64,7 @@ export default {
 </script>
 
 <template>
-  <div class="flex gap-4">
+  <div >
     <Transition name="fade">
       <ModalNewCard 
       :selectedDefault="selectedCard"
@@ -76,45 +78,57 @@ export default {
     </Transition>
 
     
-    <draggable :group="{ name: 'columns', }" handle=".drag-handle" animation="300" v-model="columns">
-      <transition-group class="flex gap-4  items-start">
-        <div v-for="column in columns" :key="column.id" :id="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
-
-          <header class="flex font-bold mb-4">
-            <div class="cursor-pointer drag-handle">
-              <span>∷</span>
-            </div>
-
-            <input v-model="column.title" @keyup.enter="$event.target.blur()" type="text" placeholder="Enter title"
-              class="title-column tracking-widest bg-bg px-1">
-          </header>
-
-          <div class="">
-            <draggable :style="`border-color: ${column.color}`" class="container-tasks border-t-2"
-              ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks' }" handle=".drag-handle"
-              animation="300" @end="onEnd">
-              <transition-group class="" :class="{ 'block min-h-[1px] duration-500': column.tasks.length == 0 }">
-                <BoardTask
-                v-for="task in column.tasks" :key="task.id" :task="task" 
-                @click="showCard(task, column.id)"
-                />
-              </transition-group>
-            </draggable>
-          </div>
-
-
-          <footer class="text-gray-500">
-            <div class="w-full p-2 mt-2 rounded hover:text-hgris cursor-pointer" @click="newCard(column.id)">
-              <span>+ Add a card</span>
-            </div>
-          </footer>
+    <div class="h-[6vh] x-border flex space-between">
+      <div class=" px-4 py-1 flex align-items">
+        <div class="tracking-widest px-1 font-bold flex items-center">
+          {{ nameBoard }}
         </div>
-      </transition-group>
-    </draggable>
-    <div>
-      <button class="bg-oscuro p-5 rounded min-w-[250px]" @click="createColumn">
-        + Add Another Column
-      </button>
+      </div>
+      <div>
+
+      </div>
+    </div>
+    <div class="flex gap-4 scroll-none h-[88vh] w-full overflow-auto p-2">
+      <draggable :group="{ name: 'columns' }" handle=".drag-handle" animation="300" v-model="columns">
+        <transition-group class="flex gap-4  items-start">
+          <div v-for="column in columns" :key="column.id" :id="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
+  
+            <header class="flex font-bold mb-4">
+              <div class="cursor-pointer drag-handle">
+                <span>∷</span>
+              </div>
+  
+              <input v-model="column.title" @keyup.enter="$event.target.blur()" type="text" placeholder="Enter title"
+                class="title-column tracking-widest bg-bg px-1">
+            </header>
+  
+            <div class="">
+              <draggable :style="`border-color: ${column.color}`" class="container-tasks border-t-2"
+                ghost-class="bg-blue-200" v-model="column.tasks" :group="{ name: 'tasks' }" handle=".drag-handle"
+                animation="300" @end="onEnd">
+                <transition-group class="" :class="{ 'block min-h-[1px] duration-500': column.tasks.length == 0 }">
+                  <BoardTask
+                  v-for="task in column.tasks" :key="task.id" :task="task" 
+                  @click="showCard(task, column.id)"
+                  />
+                </transition-group>
+              </draggable>
+            </div>
+  
+  
+            <footer class="text-gray-500">
+              <div class="w-full p-2 mt-2 rounded hover:text-hgris cursor-pointer" @click="newCard(column.id)">
+                <span>+ Add a card</span>
+              </div>
+            </footer>
+          </div>
+        </transition-group>
+      </draggable>
+      <div>
+        <button class="bg-oscuro p-5 rounded min-w-[250px]" @click="createColumn">
+          + Add Another Column
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -125,5 +139,13 @@ export default {
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+.scroll-none::-webkit-scrollbar {
+  display: none;
+}
+
+.x-border {
+  box-shadow: 0 0 0 0.1px #e2e8f0;
 }
 </style>

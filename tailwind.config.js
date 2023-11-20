@@ -7,6 +7,7 @@ export default {
   theme: {
     extend: {},
     colors: {
+      'transparent': 'transparent',
       'morado': '#635FC7',
       'hmorado': '#A8A4FF',
       'negro': '#000112',
