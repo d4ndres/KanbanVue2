@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     deleteBoard() {
-      
+      this.$store.dispatch('deleteBoard')
     }
   }
 }
@@ -30,7 +30,7 @@ export default {
       <input id="color" type="color" v-model="columnColor" class="w-6 h-6 bg-hoscuro rounded px-[1px] cursor-pointer">
     </div> -->
     <div>
-      <div @click="deleteBoard" class="font-normal px-2 py-1 my-1 hover:bg-hoscuro text-rojo">
+      <div @click="deleteBoard" class="font-normal px-2 py-1 my-1 hover:bg-hoscuro text-rojo cursor-pointer">
         Eliminar este tablero
       </div>
     </div>

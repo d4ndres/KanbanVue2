@@ -40,7 +40,7 @@ export default {
 }
 </script>
 <template>
-  <div v-on="$listeners" v-if="column" class="bg-bg py-2 border border-hoscuro rounded-lg absolute top-full left-0 w-[250px] block z-10">
+  <div v-on="$listeners" v-if="column" class="bg-bg py-2 border border-hoscuro rounded-lg absolute top-full right-full md:right-auto translate-x-6 md:translate-x-0 w-[250px] block z-10">
     <div class="border-b border-hoscuro mx-2">
       <input v-model="columnTitle" class="w-full tracking-widest bg-bg px-1 my-2 text-center" type="text">
     </div>

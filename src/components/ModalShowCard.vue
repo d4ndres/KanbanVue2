@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       title: this.selectedDefault.title,
-      description: this.selectedDefault.description ?? 'No hay descripción',
+      description: this.selectedDefault.description ?? '',
       subtasks: this.selectedDefault.subtasks ?? [],
       status: this.selectedDefault.columnId,
 
@@ -61,13 +61,13 @@ export default {
         </div>
       </div>
       <div>
-        <div class="mb-[1.5rem]">
+        <div class="mb-[1.5rem]" v-if="description">
           <p>
             {{ description }}
           </p>
         </div>
 
-        <div class="mb-[1.5rem]">
+        <div class="mb-[1.5rem]" v-if="subtasks.length">
           <p class="text-blanco text-sm mb-[1rem] font-bold">Subtasks</p>
           <div class="flex flex-col gap-2 my-[0.4rem] ">
             <div v-for="(subtask, index) in subtasks" :key="subtask + index"

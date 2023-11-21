@@ -78,10 +78,18 @@ export default {
       clearTimeout(this.timeout)
     },
     setControlColumn( columnId ) {
-      this.controlColumnShow = columnId
-      this.timeout = setTimeout(() => {
+      if( this.controlColumnShow == columnId ) {
         this.controlColumnShow = ''
-      }, 700);
+        return
+      } else {
+        this.controlColumnShow = columnId
+      }
+      
+      if( window.innerWidth > 768 ) {
+        this.timeout = setTimeout(() => {
+          this.controlColumnShow = ''
+        }, 700);
+      }
     },
   },
 }
@@ -104,7 +112,7 @@ export default {
     
     <div class="h-[6vh] x-border flex justify-between items-center">
       <div class="px-2 py-1 flex align-items">
-        <div class="tracking-widest px-1 font-bold flex items-center">
+        <div class="tracking-widest px-1 max-md:pl-3 font-bold flex items-center">
           {{ nameBoard }}
         </div>
       </div>
