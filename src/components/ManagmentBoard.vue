@@ -1,8 +1,13 @@
 <script>
+import { mapActions } from 'vuex';
 import draggable from 'vuedraggable'
 import BoardTask from '@/components/BoardTask.vue'
 import ModalNewCard from '@/components/ModalNewCard.vue';
 import ModalShowCard from '@/components/ModalShowCard.vue';
+import TreeDots from '@/components//TreeDots.vue';
+import AdminColumn from '@/components/AdminColumn.vue';
+import AdminBoard from '@/components/AdminBoard.vue';
+
 export default {
   name: 'ManagmentBoard',
   components: {
@@ -10,14 +15,18 @@ export default {
     draggable,
     ModalNewCard,
     ModalShowCard,
+    TreeDots,
+    AdminColumn,
+    AdminBoard,
 },
   data() {
     return {
       ctrl: false,
-      
       selectedCard: null,
       isModalNewCard: false,
       isModalShowCard: false,
+      controlColumnShow: '',
+      timeout: null,
     }
   },
   computed: {
@@ -39,6 +48,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['deleteColumn']),
     createColumn() {
       this.$store.dispatch('addColumn')
       this.$nextTick(() => document.querySelector('.column:last-of-type .title-column').focus())
@@ -58,7 +68,21 @@ export default {
     },
     onEnd(){
       this.$store.commit('moveTask')
-    }
+    },
+    outControlMouse() {
+      this.timeout = setTimeout(() => {
+        this.controlColumnShow = ''
+      }, 500);
+    },
+    inControlMouse() {
+      clearTimeout(this.timeout)
+    },
+    setControlColumn( columnId ) {
+      this.controlColumnShow = columnId
+      this.timeout = setTimeout(() => {
+        this.controlColumnShow = ''
+      }, 700);
+    },
   },
 }
 </script>
@@ -78,14 +102,18 @@ export default {
     </Transition>
 
     
-    <div class="h-[6vh] x-border flex space-between">
-      <div class=" px-4 py-1 flex align-items">
+    <div class="h-[6vh] x-border flex justify-between items-center">
+      <div class="px-2 py-1 flex align-items">
         <div class="tracking-widest px-1 font-bold flex items-center">
           {{ nameBoard }}
         </div>
       </div>
-      <div>
-
+      <div class="pr-4 relative">
+        <TreeDots @click="setControlColumn(nameBoard)"/>
+        <AdminBoard 
+        v-if="controlColumnShow == nameBoard"
+        @mouseleave="outControlMouse" @mouseenter="inControlMouse"
+        />
       </div>
     </div>
     <div class="flex gap-4 scroll-none h-[88vh] w-full overflow-auto p-2">
@@ -94,12 +122,20 @@ export default {
           <div v-for="column in columns" :key="column.id" :id="column.id" class="column relative bg-gray-200 p-5 rounded min-w-[250px]">
   
             <header class="flex font-bold mb-4">
-              <div class="cursor-pointer drag-handle">
-                <span>∷</span>
+              <input 
+              v-model="column.title" 
+              @keyup.enter="$event.target.blur()" 
+              type="text" placeholder="Enter title"
+              class="title-column tracking-widest bg-bg px-1">
+              
+              <div class="cursor-pointer drag-handle relative">
+                <TreeDots @click="setControlColumn(column.id)" />
+                <Transition name="fade">
+                  <AdminColumn v-if="controlColumnShow == column.id" 
+                  @mouseleave="outControlMouse" @mouseenter="inControlMouse"
+                  :columnId="column.id"/>
+                </Transition>
               </div>
-  
-              <input v-model="column.title" @keyup.enter="$event.target.blur()" type="text" placeholder="Enter title"
-                class="title-column tracking-widest bg-bg px-1">
             </header>
   
             <div class="">
@@ -143,9 +179,5 @@ export default {
 
 .scroll-none::-webkit-scrollbar {
   display: none;
-}
-
-.x-border {
-  box-shadow: 0 0 0 0.1px #e2e8f0;
 }
 </style>

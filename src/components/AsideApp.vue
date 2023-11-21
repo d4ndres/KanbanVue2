@@ -39,7 +39,7 @@ export default {
 
 <template>
   <div class="h-full">
-    <div class="h-[6vh] flex justify-between items-center pl-3">
+    <div class="h-[6vh] flex justify-between items-center pl-3  mb-2">
       <div class="tracking-widest font-bold">
         Tus tableros
       </div>

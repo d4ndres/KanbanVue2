@@ -24,8 +24,12 @@ const saveAndGetBoard = store => {
   store.subscribe((mutation, state) => {
     if( mutation.type == 'updateNameBoard' ) return;
 
+    // if( mutation.type == 'deleteBoard' ) {
+    //   localStorage.setItem('boards', JSON.stringify(state.boards));
+    // }
+
     localStorage.setItem( state.nameBoard, JSON.stringify(state.columns));
-  
+
     const listOfBoards = JSON.parse(localStorage.getItem('boards')) 
     if( !listOfBoards.includes(state.nameBoard) ) {
       listOfBoards.push(state.nameBoard);
@@ -169,7 +173,19 @@ const store = new Vuex.Store({
     },
     toggleIsChanged(state) {
       state.isChanged = !state.isChanged;
-    }
+    },
+    deleteColumn(state, columnId) {
+      state.columns = state.columns.filter(column => column.id !== columnId);
+    },
+    updateColumnTitle(state, { columnId, title }) {
+      const index = state.columns.findIndex(column => column.id === columnId);
+      state.columns[index].title = title.trim();
+    },
+    updateColumnColor(state, { columnId, color }) {
+      const index = state.columns.findIndex(column => column.id === columnId);
+      state.columns[index].color = color;
+    },
+
   },
   actions: {
     updateColumns({ commit }, payload) {
@@ -211,7 +227,17 @@ const store = new Vuex.Store({
       await dispatch('updateNameBoard', nameBoard);
       commit('setColumns', board);
       dispatch('toggleIsChanged');
-    }
+    },
+    deleteColumn({ commit }, columnId) {
+      commit('deleteColumn', columnId);
+    },
+    updateColumnTitle({ commit }, { columnId, title }) {
+      commit('updateColumnTitle', { columnId, title });
+    },
+    updateColumnColor({ commit }, { columnId, color }) {
+      commit('updateColumnColor', { columnId, color });
+    },
+
   },
   getters: {
 
