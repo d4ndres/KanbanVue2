@@ -35,9 +35,9 @@ export default {
         <div @click="isActivedAside = !isActivedAside" 
         :class="{'max-md:right-full max-md:-translate-x-full' : !isActivedAside  }"
         class="bg-hoscuro w-2 h-6 block absolute top-1/2 max-md:top-0 max-md:translate-y-1/2 -translate-y-1/2  translate-x-full cursor-pointer hover:bg-hgris duration-500 z-10"></div>
-        <!-- <Transition name="long-fade"> -->
+        <Transition name="long-fade">
           <ManagmentBoard v-if="!isChanged"/>
-        <!-- </Transition> -->
+        </Transition>
       </div>
     </div>
   </div>
