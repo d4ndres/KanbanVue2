@@ -94,7 +94,7 @@ export default {
         @focus="focused = true"
         @blur="focused = false"
         @keyup.enter="createBoard"
-        @keyup.tab="createBoard"
+        @keydown.tab="createBoard"
         @keyup.esc="cancelNewBoard"
         v-model="newBoard"
         :placeholder="!focused ? '+ Crea un tablero' : 'Ingresa el titulo del tablero'"
