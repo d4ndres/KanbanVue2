@@ -17,6 +17,7 @@ const saveAndGetBoard = store => {
   const boards = localStorage.getItem('boards');
   if (!boards) {
     localStorage.setItem('boards', JSON.stringify([store.state.nameBoard]));
+    localStorage.setItem( store.state.nameBoard, JSON.stringify(store.state.columns));
   } else {
     store.commit('setBoards', JSON.parse(boards))
     store.commit('setNameBoard', JSON.parse(boards)[0])
@@ -24,6 +25,15 @@ const saveAndGetBoard = store => {
 
   store.subscribe((mutation, state) => {
     if( mutation.type == 'updateNameBoard' ) return;
+
+    if( mutation.type == 'renameBoard' ) {
+      const oldBoards = JSON.parse(localStorage.getItem('boards'))
+      const newBoards = state.boards.filter( board => board !==  mutation.payload);
+      const nameBoardToDeleted = oldBoards.filter(board => !newBoards.includes(board));
+      console.log("nombre eliminado", nameBoardToDeleted);
+      localStorage.removeItem(nameBoardToDeleted);
+      localStorage.setItem('boards', JSON.stringify(state.boards));
+    }
 
     console.log(mutation.type);
     if( mutation.type == 'createBoard') {
@@ -203,6 +213,11 @@ const store = new Vuex.Store({
     deleteBoard(state) {
       state.boards = state.boards.filter(board => board !== state.nameBoard);
       state.nameBoard = state.boards[0];
+    },
+    renameBoard(state, name) {
+      const index = state.boards.findIndex(board => board === state.nameBoard);
+      state.nameBoard = name;
+      state.boards[index] = name;
     }
   },
   actions: {
@@ -260,6 +275,10 @@ const store = new Vuex.Store({
     },
     deleteBoard({commit, dispatch}) {
       commit('deleteBoard');
+    },
+    renameBoard({ commit }, name) {
+      const newName = name.trim();
+      commit('renameBoard', newName);
     }
   },
   getters: {
