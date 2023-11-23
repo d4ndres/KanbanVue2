@@ -137,7 +137,7 @@ export default {
               class="title-column tracking-widest bg-bg px-1">
               
               <div class="cursor-pointer drag-handle relative">
-                <TreeDots @click="setControlColumn(column.id)" />
+                <TreeDots @click="setControlColumn(column.id)" isMove/>
                 <Transition name="fade">
                   <AdminColumn v-if="controlColumnShow == column.id" 
                   @mouseleave="outControlMouse" @mouseenter="inControlMouse"
