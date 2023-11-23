@@ -1,16 +1,29 @@
 <script>
 export default {
+  data() {
+    return {
+      timeOut: null,
+    }
+  },
   computed: {
     nameBoard: {
       get() {
         return this.$store.state.nameBoard
       },
       set(value) {
-        this.$store.dispatch('updateNameBoard', value)
+        clearTimeout(this.timeOut)
+        this.timeOut = setTimeout(() => {
+          this.$store.dispatch('renameBoard', value)
+        }, 3000)
       }
     },
   },
   methods: {
+    blur( ev ) {
+      clearTimeout(this.timeOut)
+      ev.target.blur()
+      this.$store.dispatch('renameBoard', ev.target.value)
+    },
     deleteBoard() {
       this.$store.dispatch('deleteBoard')
     },
@@ -30,16 +43,9 @@ export default {
 </script>
 <template>
   <div v-on="$listeners" class="bg-bg py-2 border border-hoscuro rounded-lg absolute top-full right-full w-[250px] block z-10">
-    <div class="border-b border-hoscuro mx-2 flex items-center">
+    <div class="border-b border-hoscuro mx-2">
       <!-- <input v-model="nameBoard" class="w-full tracking-widest bg-bg px-1 my-2 text-center" type="text"> -->
-      <h2 class="w-full tracking-widest bg-bg px-1 my-2"  >{{ nameBoard }}</h2>
-      <div class="flex gap-1 items-center justify-center w-7 h-7 rounded-lg cursor-pointer hover:bg-hoscuro duration-300">
-        <svg class="w-4 h-4 inline-block" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" 
-          d="M14.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-.39.242l-3 1a1 1 0 01-1.32-1.32l1-3a1 1 0 01.242-.39l8-8a1 1 0 011.414 0zM13.586 6L6 13.586 4.414 12 12 4.414 13.586 6z" 
-          clip-rule="evenodd"></path>
-        </svg>
-      </div>
+      <input class="w-full tracking-widest bg-bg px-1 my-2" v-model="nameBoard" @keydown.enter="blur" type="text">
     </div>
     <!-- <div class="font-normal border-b border-hoscuro mx-2 py-2 flex items-center space-x-2">
       <label for="color" class="text-sm text-gray-600 cursor-pointer">
