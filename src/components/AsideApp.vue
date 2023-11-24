@@ -1,11 +1,13 @@
 <script>
 import { mapState } from "vuex";
 import draggable from 'vuedraggable'
+import PlatillasAside from "./PlatillasAside.vue";
 
 export default {
   name: "AsideApp",
   components: {
-    draggable
+    draggable,
+    PlatillasAside
   },
   data() {
     return {
@@ -67,7 +69,7 @@ export default {
 
 
 <template>
-  <div class="h-full" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
+  <div class="hide-scroll h-full overflow-y-scroll" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
     <div class="h-[6vh] flex justify-between items-center pl-3  mb-2">
       <div class="tracking-widest font-bold">
         Tus tableros
@@ -101,6 +103,15 @@ export default {
         :class="{ 'bg-transparent' : !focused, 'bg-hoscuro' : focused }"
         class="w-full p-3 my-2 duration-500 cursor-pointer">
       </div>
+      <PlatillasAside />
     </div>
   </div>
 </template>
+
+
+<style scoped>
+.hide-scroll::-webkit-scrollbar {
+  background: transparent;
+}
+
+</style>

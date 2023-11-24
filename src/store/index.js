@@ -35,8 +35,7 @@ const saveAndGetBoard = store => {
       localStorage.setItem('boards', JSON.stringify(state.boards));
     }
 
-    console.log(mutation.type);
-    if( mutation.type == 'createBoard') {
+    if( mutation.type == 'createBoard' || mutation.type == 'createBoardFromPlantilla') {
       localStorage.setItem('boards', JSON.stringify(state.boards));
     }
     
@@ -213,11 +212,19 @@ const store = new Vuex.Store({
     deleteBoard(state) {
       state.boards = state.boards.filter(board => board !== state.nameBoard);
       state.nameBoard = state.boards[0];
+      state.columns = JSON.parse(localStorage.getItem(state.nameBoard));
     },
     renameBoard(state, name) {
       const index = state.boards.findIndex(board => board === state.nameBoard);
       state.nameBoard = name;
       state.boards[index] = name;
+    },
+    createBoardFromPlantilla(state, { name, columns }) {
+      const countIncludesName = state.boards.filter(board => board.includes(name)).length;
+      const newName = countIncludesName > 0 ? `${name} (${countIncludesName})` : name;
+      state.nameBoard = newName
+      state.boards.push(newName);
+      state.columns = columns;
     }
   },
   actions: {
@@ -279,6 +286,11 @@ const store = new Vuex.Store({
     renameBoard({ commit }, name) {
       const newName = name.trim();
       commit('renameBoard', newName);
+    },
+    async createBoardFromPlantilla({ commit, dispatch }, { name, columns }) {
+      await dispatch('toggleIsChanged');
+      commit('createBoardFromPlantilla', { name, columns })
+      await dispatch('toggleIsChanged');
     }
   },
   getters: {
